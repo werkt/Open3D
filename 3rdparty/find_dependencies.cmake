@@ -651,69 +651,6 @@ else()
     list(APPEND Open3D_3RDPARTY_HEADER_TARGETS_FROM_SYSTEM Open3D::3rdparty_glew)
 endif()
 
-# GLFW
-if(USE_SYSTEM_GLFW)
-    open3d_find_package_3rdparty_library(3rdparty_glfw
-        HEADER
-        PACKAGE glfw3
-        TARGETS glfw
-    )
-    if(NOT 3rdparty_glfw_FOUND)
-        open3d_pkg_config_3rdparty_library(3rdparty_glfw
-            HEADER
-            SEARCH_ARGS glfw3
-        )
-        if(NOT 3rdparty_glfw_FOUND)
-            set(USE_SYSTEM_GLFW OFF)
-        endif()
-    endif()
-endif()
-if(NOT USE_SYSTEM_GLFW)
-    message(STATUS "Building library 3rdparty_glfw from source")
-    add_subdirectory(${Open3D_3RDPARTY_DIR}/glfw)
-    open3d_import_3rdparty_library(3rdparty_glfw
-        HEADER
-        INCLUDE_DIRS ${Open3D_3RDPARTY_DIR}/glfw/include/
-        LIBRARIES    glfw3
-        DEPENDS      glfw
-    )
-    target_link_libraries(3rdparty_glfw INTERFACE Open3D::3rdparty_threads)
-    if(UNIX AND NOT APPLE)
-        find_library(RT_LIBRARY rt)
-        if(RT_LIBRARY)
-            target_link_libraries(3rdparty_glfw INTERFACE ${RT_LIBRARY})
-        endif()
-        find_library(MATH_LIBRARY m)
-        if(MATH_LIBRARY)
-            target_link_libraries(3rdparty_glfw INTERFACE ${MATH_LIBRARY})
-        endif()
-        if(CMAKE_DL_LIBS)
-            target_link_libraries(3rdparty_glfw INTERFACE ${CMAKE_DL_LIBS})
-        endif()
-    endif()
-    if(APPLE)
-        find_library(COCOA_FRAMEWORK Cocoa)
-        find_library(IOKIT_FRAMEWORK IOKit)
-        find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
-        find_library(CORE_VIDEO_FRAMEWORK CoreVideo)
-        target_link_libraries(3rdparty_glfw INTERFACE
-            ${COCOA_FRAMEWORK}
-            ${IOKIT_FRAMEWORK}
-            ${CORE_FOUNDATION_FRAMEWORK}
-            ${CORE_VIDEO_FRAMEWORK}
-        )
-    endif()
-    if(WIN32)
-        target_link_libraries(3rdparty_glfw INTERFACE gdi32)
-    endif()
-    list(APPEND Open3D_3RDPARTY_HEADER_TARGETS_FROM_CUSTOM Open3D::3rdparty_glfw)
-else()
-    list(APPEND Open3D_3RDPARTY_HEADER_TARGETS_FROM_SYSTEM Open3D::3rdparty_glfw)
-endif()
-if(TARGET Open3D::3rdparty_x11)
-    target_link_libraries(3rdparty_glfw INTERFACE Open3D::3rdparty_x11)
-endif()
-
 # TurboJPEG
 if(USE_SYSTEM_JPEG AND BUILD_AZURE_KINECT)
     open3d_pkg_config_3rdparty_library(3rdparty_turbojpeg
